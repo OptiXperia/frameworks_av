@@ -246,6 +246,8 @@ status_t NuPlayer::GenericSource::initFromDataSource() {
                     if (mUIDValid) {
                         extractor->setUID(mUID);
                     }
+                } else {
+                     mIsWidevine = false;
                 }
             }
         }
