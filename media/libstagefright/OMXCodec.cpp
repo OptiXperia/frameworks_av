@@ -1326,11 +1326,17 @@ status_t OMXCodec::setVideoOutputFormat(
                 && colorFormat != OMX_COLOR_FormatUnused
                 && colorFormat != format.eColorFormat) {
 
-            while (OMX_ErrorNoMore != err) {
-                format.nIndex++;
+            OMX_U32 index = 1; // Index 0 is retrieved above.
+            while (index < kMaxColorFormatSupported) {
+                format.nIndex = index++;
                 err = mOMX->getParameter(
                         mNode, OMX_IndexParamVideoPortFormat,
                             &format, sizeof(format));
+                if (OK != err) {
+                    format.eColorFormat = OMX_COLOR_FormatUnused;
+                    break;
+                }
+
                 if (format.eColorFormat == colorFormat) {
                     break;
                 }
@@ -3947,13 +3953,13 @@ status_t OMXCodec::read(
             mPaused = false;
         }
 
-        drainInputBuffers();
 
         if (mState == EXECUTING) {
             // Otherwise mState == RECONFIGURING and this code will trigger
             // after the output port is reenabled.
             fillOutputBuffers();
         }
+        drainInputBuffers();
     }
 
     if (seeking) {

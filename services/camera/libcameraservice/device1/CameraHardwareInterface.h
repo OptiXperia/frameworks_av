@@ -27,6 +27,8 @@
 #include <system/window.h>
 #include <hardware/camera.h>
 
+#include "CameraService.h"
+
 namespace android {
 
 typedef void (*notify_callback)(int32_t msgType,
@@ -324,6 +326,10 @@ public:
     void releaseRecordingFrame(const sp<IMemory>& mem)
     {
         ALOGV("%s(%s)", __FUNCTION__, mName.string());
+        if (mem == NULL) {
+             ALOGE("%s: NULL memory reference", __FUNCTION__);
+             return;
+        }
         if (mDevice->ops->release_recording_frame) {
             ssize_t offset;
             size_t size;

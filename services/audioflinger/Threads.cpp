@@ -3298,6 +3298,12 @@ AudioFlinger::PlaybackThread::mixer_state AudioFlinger::MixerThread::prepareTrac
                     isActive = false;
                     break;
                 }
+                else {
+                   if (recentEmpty == 0) {
+                   // no, then ignore the partial underruns as they are allowed indefinitely
+                      break;
+                   }
+                }
                 // fall through
             case TrackBase::STOPPING_2:
             case TrackBase::PAUSED:
@@ -4063,7 +4069,7 @@ AudioFlinger::PlaybackThread::mixer_state AudioFlinger::DirectOutputThread::prep
         }
 
         if ((track->framesReady() >= minFrames) && track->isReady() && !track->isPaused() &&
-                !track->isStopping_2() && !track->isStopped())
+                !track->isStopping() && !track->isStopped())
         {
             ALOGVV("track %d s=%08x [OK]", track->name(), cblk->mServer);
 
